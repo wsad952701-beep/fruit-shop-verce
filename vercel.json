@@ -4,35 +4,23 @@
     "rewrites": [
         {
             "source": "/",
-            "destination": "/public/frontend/index.html"
+            "destination": "/frontend/index.html"
         },
         {
             "source": "/frontend",
-            "destination": "/public/frontend/index.html"
+            "destination": "/frontend/index.html"
         },
         {
             "source": "/frontend/",
-            "destination": "/public/frontend/index.html"
-        },
-        {
-            "source": "/frontend/:path*",
-            "destination": "/public/frontend/:path*"
+            "destination": "/frontend/index.html"
         },
         {
             "source": "/admin",
-            "destination": "/public/admin/dashboard.html"
+            "destination": "/admin/dashboard.html"
         },
         {
             "source": "/admin/",
-            "destination": "/public/admin/dashboard.html"
-        },
-        {
-            "source": "/admin/:path*",
-            "destination": "/public/admin/:path*"
-        },
-        {
-            "source": "/images/:path*",
-            "destination": "/public/frontend/images/:path*"
+            "destination": "/admin/dashboard.html"
         }
     ],
     "headers": [
