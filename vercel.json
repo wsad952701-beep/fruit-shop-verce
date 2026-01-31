@@ -1,19 +1,5 @@
 {
-    "version": 2,
-    "public": true,
     "rewrites": [
-        {
-            "source": "/",
-            "destination": "/frontend/index.html"
-        },
-        {
-            "source": "/frontend",
-            "destination": "/frontend/index.html"
-        },
-        {
-            "source": "/frontend/",
-            "destination": "/frontend/index.html"
-        },
         {
             "source": "/admin",
             "destination": "/admin/dashboard.html"
