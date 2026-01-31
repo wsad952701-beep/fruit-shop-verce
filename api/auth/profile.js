@@ -1,55 +1,43 @@
-// Auth API - Profile endpoint (GET and PUT)
+// Auth API - Profile endpoint (Node.js Runtime)
 import { queryOne, execute } from '../../lib/db.js';
-import { authenticateRequest, jsonResponse, errorResponse, handleOptions } from '../../lib/auth.js';
+import { verifyToken } from '../../lib/auth.js';
 
-export const config = { runtime: 'edge' };
+export default async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-export default async function handler(req) {
-    if (req.method === 'OPTIONS') return handleOptions();
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-    // 驗證用戶
-    const auth = authenticateRequest(req);
-    if (auth.error) return auth.response;
-    const user = auth.user;
+    const user = verifyToken(req.headers.authorization);
+    if (!user) return res.status(401).json({ error: '請先登入' });
 
     if (req.method === 'GET') {
         try {
             const userData = await queryOne(
-                'SELECT id, email, name, phone, address, is_admin, IFNULL(credit, 0) as credit, created_at FROM users WHERE id = ?',
+                'SELECT id, email, name, phone, address, IFNULL(credit, 0) as credit, status, created_at FROM users WHERE id = ?',
                 [user.id]
             );
-
-            if (!userData) {
-                return errorResponse('用戶不存在', 404);
-            }
-
-            return jsonResponse({ user: userData });
+            if (!userData) return res.status(404).json({ error: '用戶不存在' });
+            return res.status(200).json({ user: userData });
         } catch (error) {
             console.error('取得資料錯誤:', error);
-            return errorResponse('取得資料失敗', 500);
+            return res.status(500).json({ error: '取得資料失敗' });
         }
     }
 
     if (req.method === 'PUT') {
         try {
-            const { name, phone, address } = await req.json();
-
-            await execute(
-                'UPDATE users SET name = ?, phone = ?, address = ? WHERE id = ?',
-                [name, phone, address, user.id]
-            );
-
-            const updatedUser = await queryOne(
-                'SELECT id, email, name, phone, address FROM users WHERE id = ?',
-                [user.id]
-            );
-
-            return jsonResponse({ message: '更新成功', user: updatedUser });
+            const { name, phone, address } = req.body;
+            await execute('UPDATE users SET name = ?, phone = ?, address = ? WHERE id = ?',
+                [name || user.name, phone || null, address || null, user.id]);
+            const updated = await queryOne('SELECT id, email, name, phone, address, credit FROM users WHERE id = ?', [user.id]);
+            return res.status(200).json({ message: '更新成功', user: updated });
         } catch (error) {
             console.error('更新資料錯誤:', error);
-            return errorResponse('更新資料失敗', 500);
+            return res.status(500).json({ error: '更新失敗' });
         }
     }
 
-    return errorResponse('Method not allowed', 405);
+    return res.status(405).json({ error: 'Method not allowed' });
 }

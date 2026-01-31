@@ -1,43 +1,45 @@
-// Auth API - Login endpoint
+// Auth API - Login endpoint (Node.js Runtime)
 import bcrypt from 'bcryptjs';
 import { queryOne } from '../../lib/db.js';
-import { generateToken, jsonResponse, errorResponse, handleOptions, corsHeaders } from '../../lib/auth.js';
+import { generateToken } from '../../lib/auth.js';
 
-export const config = { runtime: 'edge' };
+export default async function handler(req, res) {
+    // CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-export default async function handler(req) {
-    if (req.method === 'OPTIONS') return handleOptions();
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     if (req.method !== 'POST') {
-        return errorResponse('Method not allowed', 405);
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
-        const { email, password } = await req.json();
+        const { email, password } = req.body;
 
         if (!email || !password) {
-            return errorResponse('請輸入 Email 和密碼', 400);
+            return res.status(400).json({ error: '請輸入 Email 和密碼' });
         }
 
-        // 查找用戶
         const user = await queryOne('SELECT * FROM users WHERE email = ?', [email]);
         if (!user) {
-            return errorResponse('Email 或密碼錯誤', 401);
+            return res.status(401).json({ error: 'Email 或密碼錯誤' });
         }
 
-        // 驗證密碼
         if (!bcrypt.compareSync(password, user.password_hash)) {
-            return errorResponse('Email 或密碼錯誤', 401);
+            return res.status(401).json({ error: 'Email 或密碼錯誤' });
         }
 
-        // 檢查帳號是否被停用
         if (user.status === 'suspended') {
-            return errorResponse('您的帳號已被停用，請聯繫客服', 403);
+            return res.status(403).json({ error: '您的帳號已被停用，請聯繫客服' });
         }
 
         const token = generateToken(user);
 
-        return jsonResponse({
+        return res.status(200).json({
             message: '登入成功',
             user: {
                 id: user.id,
@@ -49,6 +51,6 @@ export default async function handler(req) {
         });
     } catch (error) {
         console.error('登入錯誤:', error);
-        return errorResponse('登入失敗，請稍後再試', 500);
+        return res.status(500).json({ error: '登入失敗，請稍後再試' });
     }
 }
