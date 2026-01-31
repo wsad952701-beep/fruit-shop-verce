@@ -1,0 +1,122 @@
+{
+    "version": 2,
+    "public": true,
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/public/frontend/index.html"
+        },
+        {
+            "source": "/frontend",
+            "destination": "/public/frontend/index.html"
+        },
+        {
+            "source": "/frontend/",
+            "destination": "/public/frontend/index.html"
+        },
+        {
+            "source": "/frontend/:path*",
+            "destination": "/public/frontend/:path*"
+        },
+        {
+            "source": "/admin",
+            "destination": "/public/admin/dashboard.html"
+        },
+        {
+            "source": "/admin/",
+            "destination": "/public/admin/dashboard.html"
+        },
+        {
+            "source": "/admin/:path*",
+            "destination": "/public/admin/:path*"
+        },
+        {
+            "source": "/images/:path*",
+            "destination": "/public/frontend/images/:path*"
+        },
+        {
+            "source": "/api/auth/login",
+            "destination": "/api/auth/login"
+        },
+        {
+            "source": "/api/auth/register",
+            "destination": "/api/auth/register"
+        },
+        {
+            "source": "/api/auth/profile",
+            "destination": "/api/auth/profile"
+        },
+        {
+            "source": "/api/products/:path*",
+            "destination": "/api/products"
+        },
+        {
+            "source": "/api/products",
+            "destination": "/api/products"
+        },
+        {
+            "source": "/api/cart/:path*",
+            "destination": "/api/cart"
+        },
+        {
+            "source": "/api/cart",
+            "destination": "/api/cart"
+        },
+        {
+            "source": "/api/orders/:path*",
+            "destination": "/api/orders"
+        },
+        {
+            "source": "/api/orders",
+            "destination": "/api/orders"
+        },
+        {
+            "source": "/api/favorites/:path*",
+            "destination": "/api/favorites"
+        },
+        {
+            "source": "/api/favorites",
+            "destination": "/api/favorites"
+        },
+        {
+            "source": "/api/settings/:path*",
+            "destination": "/api/settings"
+        },
+        {
+            "source": "/api/settings",
+            "destination": "/api/settings"
+        },
+        {
+            "source": "/api/admin/:path*",
+            "destination": "/api/admin"
+        },
+        {
+            "source": "/api/admin",
+            "destination": "/api/admin"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET,POST,PUT,DELETE,OPTIONS"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "Content-Type, Authorization"
+                }
+            ]
+        }
+    ],
+    "functions": {
+        "api/**/*.js": {
+            "maxDuration": 10
+        }
+    }
+}
